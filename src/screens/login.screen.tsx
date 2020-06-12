@@ -1,5 +1,5 @@
 import React from 'react';
-import Login from '../components/login/login';
+import Login from '../components/login/index';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../navigators/app.navigation';
 
