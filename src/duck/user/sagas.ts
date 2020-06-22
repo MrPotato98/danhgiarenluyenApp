@@ -1,4 +1,4 @@
-import {takeEvery, put, call} from 'redux-saga/effects';
+import {takeEvery, put, call, takeLatest} from 'redux-saga/effects';
 import {UserService} from '../../services/user';
 import {loginSuccess, loginFail} from './action';
 import {LOGIN} from './type';
@@ -7,6 +7,7 @@ function* handleLogin(action: any) {
   try {
     const {email, password} = action.payload.info;
     const data = yield call(UserService.login, email, password);
+    console.log(data);
     if (data.data.success) {
       yield put(loginSuccess(data.data));
     } else {
@@ -18,5 +19,5 @@ function* handleLogin(action: any) {
 }
 
 export default function* watchUserSaga() {
-  yield takeEvery(LOGIN.LOADING, handleLogin);
+  yield takeLatest(LOGIN.LOADING, handleLogin);
 }

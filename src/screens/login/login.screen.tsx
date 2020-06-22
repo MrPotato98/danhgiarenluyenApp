@@ -1,7 +1,7 @@
 import React from 'react';
-import Login from '../components/login/login';
+import Login from '../../components/login/login';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '../navigators/app.navigation';
+import {RootStackParamList} from '../../navigators/app.navigation';
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 

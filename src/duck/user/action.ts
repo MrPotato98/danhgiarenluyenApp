@@ -2,6 +2,7 @@ import {LOGIN} from './type';
 import {UserRes, UserReq} from '../api-model/login';
 
 const login = (info: UserReq) => {
+  // console.log(info);
   return {
     type: LOGIN.LOADING,
     payload: {
@@ -11,6 +12,7 @@ const login = (info: UserReq) => {
 };
 
 const loginSuccess = (info: UserRes) => {
+  console.log(info);
   return {
     type: LOGIN.LOGIN_SUCCESS,
     payload: {
@@ -20,6 +22,7 @@ const loginSuccess = (info: UserRes) => {
 };
 
 const loginFail = (error: string) => {
+  console.log(error);
   return {
     type: LOGIN.LOGIN_FAIL,
     payload: {
