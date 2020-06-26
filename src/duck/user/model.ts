@@ -21,7 +21,8 @@ export const initUser: UserRes = {
     deleted: false,
   },
   success: false,
-  fetch: false,
+  isValidToken: false,
+  errorMessage: '',
 };
 
 export const initialStateUser: stateUserType = {

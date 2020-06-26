@@ -1,4 +1,6 @@
 import {request} from '../helpers/request.helper';
+import {errorMessage, FILE_USER_TOKEN} from '../common/constants';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export const UserService = {
   getAllUsers: () => {
@@ -42,17 +44,39 @@ export const UserService = {
   getBigTablePartner: async () => {
     return await request(`bigtable/get-partner`, {method: 'GET'});
   },
-  deleteUser: async (idUser: any) => {
-    return await request('account/delete', {
-      method: 'POST',
-      data: {idUser},
-    });
-  },
+
   login: async (email: string, password: string) => {
-    const data = await request('account/login', {
-      method: 'POST',
-      data: {email, password},
-    });
-    return data;
+    try {
+      const data = await request('account/login', {
+        method: 'POST',
+        data: {email, password},
+      });
+      return data;
+    } catch (err) {
+      return {
+        error: {
+          message:
+            errorMessage.user[err.data.statusCode].login ||
+            errorMessage[err.data.statusCode],
+        },
+      };
+    }
+  },
+  verify: async () => {
+    try {
+      const res = await request('account/verify', {
+        method: 'POST',
+      });
+      return res;
+    } catch (err) {
+      AsyncStorage.setItem(FILE_USER_TOKEN, '');
+      return {
+        error: {
+          message:
+            errorMessage.user[err.data.statusCode].login ||
+            errorMessage[err.data.statusCode],
+        },
+      };
+    }
   },
 };

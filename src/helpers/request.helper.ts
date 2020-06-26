@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {BASE_API_URL} from '../common/connection';
-import {APP_CONSTANTS} from '../common/constants';
-import {AsyncStorage} from 'react-native';
+import {FILE_USER_TOKEN} from '../common/constants';
+import AsyncStorage from '@react-native-community/async-storage';
 
 /**
  * TODO: Call api
@@ -17,7 +17,7 @@ type Options = {
 export const request = async (sourceUrl: any, option: any) => {
   try {
     option = option || {};
-    const token = await AsyncStorage.getItem('token');
+    const token = await AsyncStorage.getItem(FILE_USER_TOKEN);
     const headers = {
       'content-type': 'application/json; charset=utf-8',
       token: token ? token : undefined,

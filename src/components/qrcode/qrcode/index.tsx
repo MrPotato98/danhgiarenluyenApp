@@ -31,8 +31,8 @@ const QRcode: React.FC<Props> = ({navigation}) => {
   const [datetime, setdatetime] = useState({date: '', time: ''});
   //   const screenData = useScreenDimensions();
   useEffect(() => {
-    var date = moment().utcOffset('+07:00').format('DD.MM.YYYY');
-    var time = moment().utcOffset('+07:00').format('hh:mm:ss a');
+    let date = moment().utcOffset('+07:00').format('DD.MM.YYYY');
+    let time = moment().utcOffset('+07:00').format('hh:mm:ss a');
     let id = setInterval(() => {
       setdatetime({date, time});
     }, 1000);

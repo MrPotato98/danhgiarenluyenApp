@@ -16,7 +16,9 @@ import {RootStackParamList} from '../../../navigators/app.navigation';
 import InputTextField from '../../../common/inputTextField';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {moderateScale, sizeFont} from '../../../helpers/size.helper';
-import {COLOR} from '../../../common/constants';
+import {COLOR, FILE_USER_TOKEN} from '../../../common/constants';
+import {useNavigationState} from '@react-navigation/native';
+
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 type Props = {
@@ -24,13 +26,16 @@ type Props = {
 };
 
 const Login = ({navigation}: Props) => {
+  const [input, setInput] = useState({email: '', password: ''});
   const [toggle, setToggle] = useState(true);
   const [isSelected, setSelection] = useState(true);
 
   const dispatch = useDispatch();
 
   const user = useSelector((states: RootState) => states.user);
-
+  //route name
+  const routes = useNavigationState((state) => state.routes);
+  const currentRoute = routes[routes.length - 1].name;
   const loginRequest = useCallback(
     (email, password) => {
       dispatch(
@@ -42,12 +47,25 @@ const Login = ({navigation}: Props) => {
     },
     [dispatch],
   );
-
+  const onSubmit = (email: string, password: string) => {
+    // console.log(email);
+    if (email && password) {
+      loginRequest(email, password);
+    }
+  };
   useEffect(() => {
-    loginRequest('huy@gmail.com', '123');
-  }, []);
+    setTimeout(() => {
+      if (user.success === true && user.info && currentRoute === 'Login') {
+        navigation.replace('QRcode');
+      }
+    }, 500);
+  }, [user.info]);
 
-  console.log(user);
+  const onChange = (text: any, type: string) => {
+    setInput({...input, [type]: text});
+  };
+
+  // console.log(user);
 
   return (
     <ScrollView style={styles.container}>
@@ -72,6 +90,8 @@ const Login = ({navigation}: Props) => {
           marginVertical: 20,
         }}
         title="Email"
+        name
+        onChangeText={(text: any) => onChange(text, 'email')}
       />
       <InputTextField
         style={{
@@ -79,6 +99,7 @@ const Login = ({navigation}: Props) => {
           marginBottom: 8,
         }}
         title="Password"
+        onChangeText={(text: any) => onChange(text, 'password')}
         isSecure={toggle}
         icon={
           <TouchableOpacity
@@ -115,7 +136,7 @@ const Login = ({navigation}: Props) => {
       </View>
       <TouchableOpacity
         style={styles.submitContainer}
-        onPress={() => navigation.navigate('QRCodeScanner')}>
+        onPress={() => onSubmit(input.email, input.password)}>
         <Text
           style={[
             styles.text,
@@ -125,7 +146,7 @@ const Login = ({navigation}: Props) => {
               fontSize: 16,
             },
           ]}>
-          Login
+          {!user.running && user.isValidToken ? 'Logging...' : 'Login'}
         </Text>
       </TouchableOpacity>
     </ScrollView>

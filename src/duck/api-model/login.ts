@@ -14,7 +14,8 @@ export type UserRes = {
     deleted: boolean;
   };
   success: boolean;
-  fetch: boolean;
+  isValidToken: boolean;
+  errorMessage: string;
 };
 
 export type UserReq = {

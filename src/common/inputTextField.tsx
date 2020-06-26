@@ -19,7 +19,7 @@ export default React.memo(function InputTextField(props: any) {
       </View>
     </View>
   );
-})
+});
 
 const styles = StyleSheet.create({
   inputTitle: {
