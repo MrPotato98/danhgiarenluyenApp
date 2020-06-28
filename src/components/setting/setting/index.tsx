@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     marginStart: moderateScale(15),
   },
   body: {
+    top: moderateScale(5),
     width: width - moderateScale(30),
     height: height - moderateScale(50),
     alignSelf: 'center',

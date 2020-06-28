@@ -14,8 +14,8 @@ import SplashScreen from 'react-native-splash-screen';
 import LoginScreen from '../screens/login/login.screen';
 import QRcodeScreen from '../screens/qrcode/qrcode.screen';
 import QRCodeScannerScreen from '../screens/qrcodesanner/qrcodescanner.screen';
-
 import SettingScreen from '../screens/setting/setting.screen';
+import HomeScreen from '../screens/home/home.screen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -25,6 +25,7 @@ export type RootStackParamList = {
   QRcode: undefined;
   QRCodeScanner: undefined;
   Setting: undefined;
+  Home: undefined;
 };
 
 const AppNavigator = () => {
@@ -68,6 +69,22 @@ const AppNavigator = () => {
         <Tab.Navigator>
           <Tab.Screen
             name="Home"
+            component={HomeNav}
+            options={{
+              tabBarLabel: 'Lịch chấm công',
+              tabBarIcon: ({color, focused}) => (
+                <View>
+                  <Icon
+                    size={focused ? 32 : 24}
+                    name="calendar-check"
+                    color={color}
+                  />
+                </View>
+              ),
+            }}
+          />
+          <Tab.Screen
+            name="QRCodeScanner"
             component={QRCodeScannerNav}
             options={{
               tabBarLabel: 'Quét mã',
@@ -107,6 +124,17 @@ const AppNavigator = () => {
         </Tab.Navigator>
       )}
     </NavigationContainer>
+  );
+};
+const HomeNav = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{title: 'HomeScreen', gestureEnabled: false}}
+      />
+    </Stack.Navigator>
   );
 };
 const QRcodeNav = () => {
