@@ -45,6 +45,14 @@ export const UserService = {
     return await request(`bigtable/get-partner`, {method: 'GET'});
   },
 
+  check: async () => {
+    return await request(`time-keeping/check`, {method: 'POST'});
+  },
+
+  getIsCheck: async () => {
+    return await request(`time-keeping/is-checkin`, {method: 'GET'});
+  },
+
   login: async (email: string, password: string) => {
     try {
       const data = await request('account/login', {

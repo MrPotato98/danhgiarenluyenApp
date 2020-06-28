@@ -1,4 +1,7 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../duck/root.reducer';
+
 import moment from 'moment';
 import {
   StyleSheet,
@@ -15,6 +18,13 @@ import {moderateScale, sizeWidth, sizeFont} from '../../../helpers/size.helper';
 import {COLOR} from '../../../common/constants';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
+// import Dialog, {
+//   DialogFooter,
+//   DialogButton,
+//   DialogContent,
+// } from 'react-native-popup-dialog';
+
+import {check as checkIn, getIsCheck} from '../../../duck/check/action';
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 type Props = {
@@ -22,6 +32,23 @@ type Props = {
 };
 const {width, height} = Dimensions.get('window');
 const QRcodeScan: React.FC<Props> = ({navigation}) => {
+  const [isChecking, setIsChecking] = useState(false);
+  const dispatch = useDispatch();
+
+  const checkRequest = useCallback(() => {
+    dispatch(checkIn());
+  }, [dispatch]);
+
+  const isCheck = useCallback(() => {
+    dispatch(getIsCheck());
+  }, [dispatch]);
+
+  const checkStore = useSelector((states: any) => states.check);
+
+  useEffect(() => {
+    isCheck();
+  }, [checkStore.result]);
+
   const date = moment().utcOffset('+07:00').format('DD.MM.YYYY');
   const time = moment().utcOffset('+07:00').format('hh:mm:ss a');
   const [state, setState] = useState({
@@ -29,27 +56,61 @@ const QRcodeScan: React.FC<Props> = ({navigation}) => {
     scan: true,
     ScanResult: false,
   });
-  const gotoWeb = () => {
-    Linking.openURL('http://localhost:3000');
+  const gotoWeb = (e: any) => {
+    // Linking.openURL('http://localhost:3000');
+    setState({
+      result: e,
+      scan: true,
+      ScanResult: false,
+    });
   };
   const onSuccess = (e: any) => {
     const check = e.data;
-    Alert.alert(time, date);
-    setState({
-      result: e,
-      scan: false,
-      ScanResult: true,
-    });
-    if (check === 'http') {
-      Linking.openURL(e.data).catch((err) =>
-        Alert.alert('An error occured', err),
-      );
-    } else {
+
+    var todayDate = new Date().toISOString().slice(0, 10);
+
+    if (check === todayDate) {
+      if (checkStore.isCheck.success) {
+        if (
+          checkStore.isCheck.result.checkin &&
+          !checkStore.isCheck.result.checkout
+        ) {
+          Alert.alert(
+            //title
+            'Checkout',
+            //body
+            'Bạn muốn check out?',
+            [
+              {text: 'Hủy', onPress: () => {}},
+              {text: 'Đồng ý', onPress: () => checkRequest()},
+            ],
+            {cancelable: true},
+          );
+        }
+        if (
+          !checkStore.isCheck.result.checkin &&
+          !checkStore.isCheck.result.checkout
+        ) {
+          checkRequest();
+          Alert.alert('Bạn đã checkin thành công');
+        }
+
+        if (
+          checkStore.isCheck.result.checkin &&
+          checkStore.isCheck.result.checkout
+        ) {
+          Alert.alert('Bạn đã hoàn thành điểm danh rồi');
+        }
+      }
+
+      // Alert.alert(time, date);
       setState({
         result: e,
         scan: false,
         ScanResult: true,
       });
+    } else {
+      Alert.alert('Mã không đúng');
     }
   };
 
@@ -60,7 +121,7 @@ const QRcodeScan: React.FC<Props> = ({navigation}) => {
           reactivate={true}
           // cameraType={'front'}
           onRead={onSuccess}
-          flashMode={RNCamera.Constants.FlashMode.torch}
+          // flashMode={RNCamera.Constants.FlashMode.torch}
           showMarker={true}
           markerStyle={{borderColor: '#fff', borderRadius: 10}}
           topContent={
@@ -91,7 +152,7 @@ const QRcodeScan: React.FC<Props> = ({navigation}) => {
                   styles.centerText,
                   {color: COLOR.white, padding: moderateScale(10)},
                 ]}>
-                Chuyển đến web để kiểm tra !
+                Chấm công
               </Text>
             </TouchableOpacity>
           </View>
