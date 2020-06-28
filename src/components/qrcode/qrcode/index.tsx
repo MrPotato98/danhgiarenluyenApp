@@ -38,6 +38,9 @@ const QRcode: React.FC<Props> = ({navigation}) => {
     }, 1000);
     return () => clearInterval(id);
   });
+
+  var todayDate = new Date().toISOString().slice(0, 10);
+
   return (
     <View style={styles.container}>
       <View style={styles.body}>
@@ -52,7 +55,7 @@ const QRcode: React.FC<Props> = ({navigation}) => {
           style={styles.line}
           source={require('../../../../res/icon/line.png')}
         />
-        <QRCode value="hello" size={moderateScale(120)} />
+        <QRCode value={todayDate} size={moderateScale(120)} />
         <Text style={[styles.desc, {textAlign: 'center'}]}>
           Cập nhật hôm nay, {moment().utcOffset('+07:00').format('hh:mm a')}
         </Text>
