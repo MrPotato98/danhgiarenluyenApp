@@ -1,5 +1,3 @@
-export const VERIFY = 'USER/VERIFY';
-
 export const LOGIN = {
   LOADING: 'USER/LOADING',
   LOGIN_SUCCESS: 'USER/LOGIN_SUCCESS',

@@ -28,19 +28,23 @@ type Props = {
 };
 const {width, height} = Dimensions.get('window');
 const QRcode: React.FC<Props> = ({navigation}) => {
-  const [datetime, setdatetime] = useState({date: '', time: ''});
+  const [datetime, setdatetime] = useState({date: '', time: '', now: ''});
   //   const screenData = useScreenDimensions();
   useEffect(() => {
+    let dates = new Date();
+    let now = new Date(dates.getTime() - dates.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 10);
     let date = moment().utcOffset('+07:00').format('DD.MM.YYYY');
     let time = moment().utcOffset('+07:00').format('hh:mm:ss a');
     let id = setInterval(() => {
-      setdatetime({date, time});
+      setdatetime({date, time, now});
     }, 1000);
     return () => clearInterval(id);
   });
 
-  var todayDate = new Date().toISOString().slice(0, 10);
-
+  // var todayDate = moment().utcOffset('+07:00');
+  // console.log(datetime.now);
   return (
     <View style={styles.container}>
       <View style={styles.body}>
@@ -55,7 +59,11 @@ const QRcode: React.FC<Props> = ({navigation}) => {
           style={styles.line}
           source={require('../../../../res/icon/line.png')}
         />
-        <QRCode value={todayDate} size={moderateScale(120)} />
+        {datetime.now ? (
+          <QRCode value={datetime.now} size={moderateScale(120)} />
+        ) : (
+          <Text style={[styles.desc, {textAlign: 'center'}]}>Loading ...</Text>
+        )}
         <Text style={[styles.desc, {textAlign: 'center'}]}>
           Cập nhật hôm nay, {moment().utcOffset('+07:00').format('hh:mm a')}
         </Text>

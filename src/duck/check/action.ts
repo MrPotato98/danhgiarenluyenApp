@@ -50,7 +50,11 @@ const getIsCheckFail = (error: any) => {
     },
   };
 };
-
+export const resetCheck = () => {
+  return {
+    type: CHECK.RESET,
+  };
+};
 export {
   check,
   checkSuccess,

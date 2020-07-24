@@ -1,6 +1,6 @@
 import {UserRes, UserReq} from '../api-model/login';
 
-export type stateUserType = {
+export type StateUserType = {
   info: UserRes;
   running: boolean;
 };
@@ -25,7 +25,7 @@ export const initUser: UserRes = {
   errorMessage: '',
 };
 
-export const initialStateUser: stateUserType = {
+export const initialStateUser: StateUserType = {
   info: initUser,
   running: false,
 };

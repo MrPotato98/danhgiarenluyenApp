@@ -53,6 +53,12 @@ export const UserService = {
     return await request(`time-keeping/is-checkin`, {method: 'GET'});
   },
 
+  getTimeSheet: async () => {
+    return await request(`time-keeping/time-sheets`, {method: 'GET'});
+  },
+  getAdminTimeSheet: async () => {
+    return await request(`time-keeping/manager-time-sheets`, {method: 'GET'});
+  },
   login: async (email: string, password: string) => {
     try {
       const data = await request('account/login', {

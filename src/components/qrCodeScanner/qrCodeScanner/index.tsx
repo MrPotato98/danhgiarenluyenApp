@@ -18,11 +18,6 @@ import {moderateScale, sizeWidth, sizeFont} from '../../../helpers/size.helper';
 import {COLOR} from '../../../common/constants';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
-// import Dialog, {
-//   DialogFooter,
-//   DialogButton,
-//   DialogContent,
-// } from 'react-native-popup-dialog';
 
 import {check as checkIn, getIsCheck} from '../../../duck/check/action';
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
@@ -32,7 +27,6 @@ type Props = {
 };
 const {width, height} = Dimensions.get('window');
 const QRcodeScan: React.FC<Props> = ({navigation}) => {
-  const [isChecking, setIsChecking] = useState(false);
   const dispatch = useDispatch();
 
   const checkRequest = useCallback(() => {
@@ -56,7 +50,7 @@ const QRcodeScan: React.FC<Props> = ({navigation}) => {
     scan: true,
     ScanResult: false,
   });
-  const gotoWeb = (e: any) => {
+  const _backToCamera = (e: any) => {
     // Linking.openURL('http://localhost:3000');
     setState({
       result: e,
@@ -67,7 +61,12 @@ const QRcodeScan: React.FC<Props> = ({navigation}) => {
   const onSuccess = (e: any) => {
     const check = e.data;
 
-    var todayDate = new Date().toISOString().slice(0, 10);
+    let dates = new Date();
+    let todayDate = new Date(
+      dates.getTime() - dates.getTimezoneOffset() * 60000,
+    )
+      .toISOString()
+      .slice(0, 10);
 
     if (check === todayDate) {
       if (checkStore.isCheck.success) {
@@ -146,7 +145,9 @@ const QRcodeScan: React.FC<Props> = ({navigation}) => {
               <Text style={styles.textBold}>{time}</Text> ngày{' '}
               <Text style={styles.textBold}>{date}</Text>
             </Text>
-            <TouchableOpacity style={styles.submitContainer} onPress={gotoWeb}>
+            <TouchableOpacity
+              style={styles.submitContainer}
+              onPress={_backToCamera}>
               <Text
                 style={[
                   styles.centerText,

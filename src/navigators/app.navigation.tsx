@@ -55,7 +55,7 @@ const AppNavigator = () => {
     // if (user.info) return;
     getUser();
   }, []);
-
+  // console.log(user);
   return (
     <NavigationContainer>
       {!user.isValidToken ? (
@@ -99,17 +99,23 @@ const AppNavigator = () => {
               ),
             }}
           />
-          <Tab.Screen
-            name="Mã QR"
-            component={QRcodeNav}
-            options={{
-              tabBarIcon: ({color, focused}) => (
-                <View>
-                  <Icon size={focused ? 32 : 24} name="qrcode" color={color} />
-                </View>
-              ),
-            }}
-          />
+          {user.info.job_id === 1 && (
+            <Tab.Screen
+              name="Mã QR"
+              component={QRcodeNav}
+              options={{
+                tabBarIcon: ({color, focused}) => (
+                  <View>
+                    <Icon
+                      size={focused ? 32 : 24}
+                      name="qrcode"
+                      color={color}
+                    />
+                  </View>
+                ),
+              }}
+            />
+          )}
           <Tab.Screen
             name="Setting"
             component={SettingNav}

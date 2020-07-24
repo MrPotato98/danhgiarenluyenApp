@@ -146,7 +146,7 @@ const Login = ({navigation}: Props) => {
               fontSize: 16,
             },
           ]}>
-          {!user.running && user.isValidToken ? 'Logging...' : 'Login'}
+          {user.running && !user.isValidToken ? 'Logging...' : 'Login'}
         </Text>
       </TouchableOpacity>
     </ScrollView>

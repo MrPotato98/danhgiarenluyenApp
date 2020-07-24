@@ -1,5 +1,6 @@
 import * as model from './model';
 import {CHECK, GET_IS_CHECK} from './type';
+import {initialStateUser} from './model';
 
 const userReducer = (state: {} = model.initialStateUser, action: any) => {
   switch (action.type) {
@@ -31,6 +32,8 @@ const userReducer = (state: {} = model.initialStateUser, action: any) => {
         running: false,
         errorMessage: action.payload.error,
       });
+    case CHECK.RESET:
+      return Object.assign({}, state, initialStateUser);
     default:
       return state;
   }

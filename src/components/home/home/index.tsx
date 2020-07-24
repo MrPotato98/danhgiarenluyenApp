@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import moment from 'moment';
 import {
   StyleSheet,
@@ -13,7 +13,12 @@ import {moderateScale, sizeWidth, sizeFont} from '../../../helpers/size.helper';
 import {COLOR} from '../../../common/constants';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../duck/root.reducer';
-import {Calendar, CalendarList, Agenda} from 'react-native-calendars';
+import {Agenda} from 'react-native-calendars';
+import {
+  getTimeSheet,
+  getAdminTimeSheet,
+  resetData,
+} from '../../../duck/time-sheets/action';
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -23,40 +28,114 @@ type Props = {
 
 const {width, height} = Dimensions.get('window');
 const Home: React.FC<Props> = ({navigation}) => {
-  const [state, setState] = useState({items: {}});
+  const [myTimeSheet, setMyTimeSheet] = useState({});
+  const timeSheet = useSelector((states: RootState) => states.timesheet);
   const user = useSelector((states: RootState) => states.user);
   const dispatch = useDispatch();
 
-  const timeToString = (time: any) => {
-    const date = new Date(time);
-    return date.toISOString().split('T')[0];
-  };
+  const getTimeSheetRequest = useCallback(async () => {
+    await dispatch(getTimeSheet());
+  }, [dispatch]);
 
-  const loadItems = (day: any) => {
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = timeToString(time);
-        if (!state.items[strTime]) {
-          state.items[strTime] = [];
-          const numItems = Math.floor(Math.random() * 3 + 1);
-          for (let j = 0; j < numItems; j++) {
-            state.items[strTime].push({
-              name: 'Item for ' + strTime + ' #' + j,
-              height: Math.max(50, Math.floor(Math.random() * 150)),
-            });
-          }
-        }
+  const getAdminTimeSheetRequest = useCallback(async () => {
+    await dispatch(getAdminTimeSheet());
+  }, [dispatch]);
+  //call API
+  useEffect(() => {
+    if (user.info && user.info.job_id !== 0) getTimeSheetRequest();
+    // if (user.info && user.info.job_id === 1) getAdminTimeSheetRequest();
+  }, []);
+  const getUserTimeSheet = useCallback(async () => {
+    if (timeSheet && timeSheet.result.success === true) {
+      let date: any = await timeSheet.result.result.map((i: any) => i.date);
+      let checkin: any = await timeSheet.result.result.map((i: any) =>
+        moment(new Date(i.checkin)).format('hh:mm:ss a'),
+      );
+      let checkout: any = await timeSheet.result.result.map((i: any) =>
+        i.checkout
+          ? moment(new Date(i.checkout)).format('hh:mm:ss a')
+          : 'Bạn quên chưa check out',
+      );
+      let res: any = new Object();
+      let arr = [];
+      for (var i = 0, length = date.length; i < length; i++) {
+        res = date[i];
+        arr.push({
+          [res]: [
+            {
+              name:
+                'Bạn đi làm vào lúc: ' +
+                checkin[i] +
+                ' - ' +
+                'ra về vào lúc: ' +
+                checkout[i],
+            },
+          ],
+        });
       }
-      const newItems: any = {};
-      Object.keys(state.items).forEach((key) => {
-        newItems[key] = state.items[key];
-      });
-      setState({
-        items: newItems,
-      });
-    }, 1000);
-  };
+      setMyTimeSheet(
+        arr.reduce(function (result, item) {
+          var key: any = Object.keys(item)[0]; //first property: a, b, c
+          result[key] = item[key];
+          return result;
+        }, {}),
+      );
+    }
+  }, [timeSheet.result]);
+  // console.log(timeSheet.admin);
+
+  // const getAdminTimeSheets = useCallback(async () => {
+  //   if (timeSheet && timeSheet.admin.success === true) {
+  //     let date: any = await timeSheet.admin.result.map((i: any) =>
+  //       i.timesheet.map((ii: any) => ii.date),
+  //     );
+  //     // let checkin: any = await timeSheet.admin.result.map((i: any) =>
+  //     //   moment(new Date(i.checkin)).format('hh:mm:ss a'),
+  //     // );
+
+  //     //   let checkout: any = await timeSheet.admin.admin.map((i: any) =>
+  //     //     i.checkout
+  //     //       ? moment(new Date(i.checkout)).format('hh:mm:ss a')
+  //     //       : 'Bạn quên chưa check out',
+  //     //   );
+  //     let res: any = new Object();
+  //     let arr = [];
+  //     for (var i = 0, length = date.length; i < length; i++) {
+  //       if (date[i].length > 0) {
+  //         res = date[i];
+  //         arr.push({
+  //           [res[i]]: [
+  //             {
+  //               name: 'abc',
+  //             },
+  //           ],
+  //         });
+  //       }
+  //     }
+  //     console.log(
+  //       arr.reduce(function (result, item) {
+  //         var key: any = Object.keys(item)[0]; //first property: a, b, c
+  //         result[key] = item[key];
+  //         return result;
+  //       }, {}),
+  //     );
+  //     // setMyTimeSheet(
+  //     //   arr.reduce(function (result, item) {
+  //     //     var key: any = Object.keys(item)[0]; //first property: a, b, c
+  //     //     result[key] = item[key];
+  //     //     return result;
+  //     //   }, {}),
+  //     // );
+  //   }
+  // }, [timeSheet.admin.success]);
+  // useEffect(() => {
+  //   if (user.info && user.info.job_id === 1) getAdminTimeSheets();
+  // }, [getAdminTimeSheets]);
+  useEffect(() => {
+    if (user.info && user.info.job_id !== 0) getUserTimeSheet();
+  }, [getUserTimeSheet]);
+  // console.log(myTimeSheet);
+
   const renderItem = (item: any) => {
     return (
       <View style={{flex: 1}}>
@@ -87,39 +166,27 @@ const Home: React.FC<Props> = ({navigation}) => {
     );
   };
 
-  //   console.log(user);
   return (
     <View style={styles.container}>
       <View style={styles.body}>
         <Agenda
-          items={{
-            '2020-06-22': [{name: 'item 1 - any js object'}],
-            '2020-06-23': [{name: 'item 2 - any js object'}],
-            '2020-06-25': [],
-            '2020-06-27': [
-              {name: 'item 3 - any js object'},
-              {name: 'any js object'},
-            ],
-            '2020-06-21': [
-              {name: 'item 3 - any js object'},
-              {name: 'any js object'},
-            ],
-            '2020-06-26': [
-              {name: 'item 3 - any js object'},
-              {name: 'any js object'},
-            ],
-            '2020-06-28': [
-              {name: 'item 3 - any js object'},
-              {name: 'any js object'},
-            ],
-          }}
-          selected={'2020-06-22'}
-          loadItemsForMonth={loadItems.bind(this)}
+          items={Object.keys(myTimeSheet).length === 0 ? {} : myTimeSheet}
+          selected={new Date()}
+          // loadItemsForMonth={loadItems.bind(this)}
           rowHasChanged={(r1: any, r2: any) => {
             return r1.name !== r2.name;
           }}
           renderItem={renderItem.bind(this)}
           renderEmptyDate={renderEmptyDate.bind(this)}
+          minDate={new Date().setDate(new Date().getDate() - 90)}
+          maxDate={new Date().setDate(new Date().getDate() + 90)}
+          pastScrollRange={3}
+          futureScrollRange={3}
+          onRefresh={() => {
+            dispatch(getTimeSheet());
+          }}
+          refreshing={false}
+          refreshControl={null}
           // theme={{
           //   agendaDayTextColor: 'yellow',
           //   agendaDayNumColor: 'green',

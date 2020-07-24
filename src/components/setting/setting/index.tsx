@@ -14,6 +14,8 @@ import {COLOR} from '../../../common/constants';
 import {useDispatch, useSelector} from 'react-redux';
 import {logOut} from '../../../duck/user/action';
 import {RootState} from '../../../duck/root.reducer';
+import {resetCheck} from '../../../duck/check/action';
+import {resetTimeSheets} from '../../../duck/time-sheets/action';
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList>;
 
 type Props = {
@@ -25,6 +27,8 @@ const Setting: React.FC<Props> = ({navigation}) => {
   const dispatch = useDispatch();
   const _Logout = () => {
     dispatch(logOut());
+    dispatch(resetCheck());
+    dispatch(resetTimeSheets());
   };
   useEffect(() => {
     if (user.isValidToken === false && !user.info) {
