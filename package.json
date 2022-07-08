@@ -20,7 +20,7 @@
     "@types/react-native-vector-icons": "^6.4.5",
     "@types/react-redux": "^7.1.9",
     "axios": "^0.21.1",
-    "moment": "^2.26.0",
+    "moment": "^2.29.4",
     "react": "16.11.0",
     "react-native": "0.62.3",
     "react-native-calendars": "^1.300.0",
